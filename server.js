@@ -79,27 +79,29 @@ const viewDepartments = () => {
 
 // function for viewRoles
 const viewRoles = () => {
-  db.query("SELECT * FROM role", function (err, results) {
-    console.log("\n");
-    console.table(results);
-  });
+  db.query(
+    "SELECT role.id, role.title, role.salary, department.name as department FROM role JOIN department ON role.department_id = department.id",
+    function (err, results) {
+      console.log("\n");
+      console.table(results);
+    }
+  );
   empTracker();
 };
 
-// function for viewEmployees
+// function for viewEmployees - TO DO: db.query select statement
 const viewEmployees = () => {
-  db.query("SELECT * FROM employee", function (err, results) {
-    console.log("\n");
-    console.table(results);
-  });
+  db.query(
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name as department, role.salary, employee.manager_id as manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
+    function (err, results) {
+      console.log("\n");
+      console.table(results);
+    }
+  );
   empTracker();
 };
 
 // function for addDepartment
-// inquirer .prompt([message: What is the name of the department?])
-// 2 Queries
-// INSERT INTO (res)
-// SELECT * FROM department
 const addDepartment = () => {
   inquirer
     .prompt([
@@ -126,44 +128,58 @@ const addDepartment = () => {
 
 // function for addRole
 const addRole = () => {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        message: "What is the name of the role you would like to add?",
-        name: "newRole",
-      },
-      {
-        type: "input",
-        message: "What is the salary of the role?",
-        name: "newSalary",
-      },
-      {
-        type: "choices",
-        message: "Which department does the role belong to?",
-        name: "newRoleD",
-        choices: viewDepartments,
-      },
-    ])
-    .then((input) => {
-      db.query(
-        "INSERT INTO role SET name = ?",
-        input.newRole,
-        (err, results) => {
-          if (err) {
-            throw err;
+  db.query("SELECT id as value, name FROM department", (err, results) => {
+    err ? console.log(err) : console.log("\n");
+
+    console.table(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What is the name of the role you would like to add?",
+          name: "title",
+        },
+        {
+          type: "input",
+          message: "What is the salary of the role?",
+          name: "salary",
+        },
+        {
+          type: "list",
+          message: "Which department does the role belong to?",
+          name: "department_id",
+          choices: results,
+        },
+      ])
+      .then(({ title, salary, department_id }) => {
+        db.query(
+          `INSERT INTO role (title, salary, department_id) VALUES ("${title}", "${salary}", "${department_id}")`,
+          (err, results) => {
+            err ? console.log(err) : console.log("New role saved.");
+            empTracker();
           }
-          console.log("New role saved.");
-        }
-      );
-    });
+        );
+      });
+  });
 };
 
-// function for addEmployee
+// TO DO: function for addEmployee
+const addEmployee = () => {
+  db.query("", (err, results) => {
+    err ? console.log(err) : console.log("\n");
 
-// function for updateRole
+    console.table(results);
+
+    inquirer.prompt([{}]);
+  });
+};
+
+// TO DO: function for updateRole
 
 // Quit function
-// process.exit() -- exit is a method
+const quitProgram = () => {
+  process.exit();
+};
 
 empTracker();
