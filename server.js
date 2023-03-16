@@ -110,10 +110,10 @@ const addDepartment = () => {
         name: "newDept",
       },
     ])
-    .then((res) => {
+    .then((input) => {
       db.query(
         "INSERT INTO department SET name = ?",
-        res.newDept,
+        input.newDept,
         (err, results) => {
           if (err) {
             throw err;
@@ -132,6 +132,33 @@ const addDepartment = () => {
 };
 
 // function for addRole
+const addRole = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "What is the name of the role you would like to add?",
+        name: "newRole",
+      },
+      {
+        type: "input",
+        message: "What is the salary of the role?",
+        name: "newSalary",
+      },
+    ])
+    .then((input) => {
+      db.query(
+        "INSERT INTO role SET name = ?",
+        input.newRole,
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+          console.log("New role saved.");
+        }
+      );
+    });
+};
 
 // function for addEmployee
 
