@@ -4,7 +4,6 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 // Package to print MySQL rows to the console
 const cTable = require("console.table");
-const { throwError } = require("rxjs");
 
 // connect to server
 const db = mysql.createConnection(
@@ -119,15 +118,9 @@ const addDepartment = () => {
             throw err;
           }
           console.log("New department saved.");
+          empTracker();
         }
       );
-    })
-    .then(() => {
-      db.query("SELECT * FROM department", function (err, results) {
-        console.log("\n");
-        console.table(results);
-        empTracker();
-      });
     });
 };
 
@@ -144,6 +137,12 @@ const addRole = () => {
         type: "input",
         message: "What is the salary of the role?",
         name: "newSalary",
+      },
+      {
+        type: "choices",
+        message: "Which department does the role belong to?",
+        name: "newRoleD",
+        choices: viewDepartments,
       },
     ])
     .then((input) => {
