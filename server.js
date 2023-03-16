@@ -166,13 +166,46 @@ const addRole = () => {
 
 // TO DO: function for addEmployee
 const addEmployee = () => {
-  db.query("", (err, results) => {
-    err ? console.log(err) : console.log("\n");
+  db.query(
+    "SELECT id as value, first_name, last_name, role_id, manager_id FROM employee",
+    (err, results) => {
+      err ? console.log(err) : console.log("\n");
 
-    console.table(results);
+      console.table(results);
 
-    inquirer.prompt([{}]);
-  });
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "What is the employee's first name?",
+            name: "first_name",
+          },
+          {
+            type: "input",
+            message: "What is the employee's last name?",
+            name: "last_name",
+          },
+          {
+            type: "list",
+            message: "What is the employee's role?",
+            name: "role_id",
+            choices: empResults,
+          },
+          {
+            type: "list",
+            message: "Who is the employee's manager?",
+            name: "manager_id",
+            choices: mgrResults,
+          },
+        ])
+        .then(({ first_name, last_name, role_id, manager_id }) => {
+          db.query(``, (err, results) => {
+            err ? console.log(err) : console.log("New employee saved.");
+            empTracker();
+          });
+        });
+    }
+  );
 };
 
 // TO DO: function for updateRole
