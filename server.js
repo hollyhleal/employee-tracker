@@ -4,6 +4,7 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 // Package to print MySQL rows to the console
 const cTable = require("console.table");
+const { throwError } = require("rxjs");
 
 // connect to server
 const db = mysql.createConnection(
@@ -65,12 +66,6 @@ function empTracker() {
           quitProgram();
           break;
       }
-
-      // console.table(department);
-      // .catch((err) => {
-      //   console.log(err);
-      //   console.log("Something went wrong.");
-      // });
     });
 }
 
@@ -107,8 +102,40 @@ const viewEmployees = () => {
 // INSERT INTO (res)
 // SELECT * FROM department
 const addDepartment = () => {
-  db.query("INSERT INTO department (id, name) VALUES");
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "What is the name of the department you would like to add?",
+        name: "newDept",
+      },
+    ])
+    .then((res) => {
+      db.query(
+        "INSERT INTO department SET name = ?",
+        res.newDept,
+        (err, results) => {
+          if (err) {
+            throw err;
+          }
+          console.log("New department saved.");
+        }
+      );
+    })
+    .then(() => {
+      db.query("SELECT * FROM department", function (err, results) {
+        console.log("\n");
+        console.table(results);
+        empTracker();
+      });
+    });
 };
+
+// function for addRole
+
+// function for addEmployee
+
+// function for updateRole
 
 // Quit function
 // process.exit() -- exit is a method
