@@ -223,6 +223,49 @@ const addEmployee = () => {
 };
 
 // TO DO: function for updateRole
+const updateRole = () => {
+  db.query(
+    `SELECT CONCAT(first_name, " ", last_name) AS name, id AS value FROM employee`,
+    (err, results) => {
+      err ? console.log(err) : console.log(results);
+      db.query(
+        "SELECT id as value, title as name FROM role",
+        (err, roleResults) => {
+          err ? console.log(err) : console.log(roleResults);
+
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                message: "Which employee's role do you want to update?",
+                name: "id",
+                choices: results,
+              },
+              {
+                type: "list",
+                message:
+                  "Which role do you want to assign to the selected employee?",
+                name: "role_id",
+                choices: roleResults,
+              },
+            ])
+            .then((data) => {
+              let id = data.id;
+              let role_id = data.role_id;
+              db.query(
+                "UPDATE employee SET role_id = ? WHERE id = ?",
+                [role_id, id],
+                (err, results) => {
+                  err ? console.log(err) : console.log("Role updated.");
+                  empTracker();
+                }
+              );
+            });
+        }
+      );
+    }
+  );
+};
 
 // Quit function
 const quitProgram = () => {
