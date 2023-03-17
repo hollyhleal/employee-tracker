@@ -89,16 +89,16 @@ const viewRoles = () => {
   empTracker();
 };
 
-// function for viewEmployees - TO DO: db.query select statement
+// function for viewEmployees
 const viewEmployees = () => {
   db.query(
-    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name as department, role.salary, employee.manager_id as manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, employee.manager_id AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
     function (err, results) {
       console.log("\n");
       console.table(results);
+      empTracker();
     }
   );
-  empTracker();
 };
 
 // function for addDepartment
@@ -166,46 +166,60 @@ const addRole = () => {
 
 // TO DO: function for addEmployee
 const addEmployee = () => {
-  db.query(
-    "SELECT id as value, first_name, last_name, role_id, manager_id FROM employee",
-    (err, results) => {
-      err ? console.log(err) : console.log("\n");
+  db.query("SELECT id AS value, title AS name FROM role", (err, empResults) => {
+    err ? console.log(err) : console.log("\n");
 
-      console.table(results);
+    console.table(empResults);
 
-      inquirer
-        .prompt([
-          {
-            type: "input",
-            message: "What is the employee's first name?",
-            name: "first_name",
-          },
-          {
-            type: "input",
-            message: "What is the employee's last name?",
-            name: "last_name",
-          },
-          {
-            type: "list",
-            message: "What is the employee's role?",
-            name: "role_id",
-            choices: empResults,
-          },
-          {
-            type: "list",
-            message: "Who is the employee's manager?",
-            name: "manager_id",
-            choices: mgrResults,
-          },
-        ])
-        .then(({ first_name, last_name, role_id, manager_id }) => {
-          db.query(``, (err, results) => {
-            err ? console.log(err) : console.log("New employee saved.");
-            empTracker();
+    db.query(
+      `SELECT CONCAT(first_name, " ", last_name) AS name, id AS value FROM employee WHERE manager_id is null`,
+      (err, mgrResults) => {
+        err ? console.log(err) : console.log("\n");
+
+        console.table(mgrResults);
+
+        inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "What is the employee's first name?",
+              name: "first_name",
+            },
+            {
+              type: "input",
+              message: "What is the employee's last name?",
+              name: "last_name",
+            },
+            {
+              type: "list",
+              message: "What is the employee's role?",
+              name: "role_id",
+              choices: empResults,
+            },
+            {
+              type: "list",
+              message: "Who is the employee's manager?",
+              name: "manager_id",
+              choices: mgrResults,
+            },
+          ])
+          .then((data) => {
+            let first_name = data.first_name;
+            let last_name = data.last_name;
+            let role_id = data.role_id;
+            let manager_id = data.manager_id;
+            db.query(
+              "INSERT INTO employee SET first_name = ?, last_name = ?, role_id = ?, manager_id = ?",
+              [first_name, last_name, role_id, manager_id],
+              (err, data) => {
+                err ? console.log(err) : console.log("New employee saved.");
+                empTracker();
+              }
+            );
           });
-        });
-    }
-  );
+      }
+    );
+  });
 };
 
 // TO DO: function for updateRole
