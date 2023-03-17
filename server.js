@@ -164,7 +164,7 @@ const addRole = () => {
   });
 };
 
-// TO DO: function for addEmployee
+// function for addEmployee
 const addEmployee = () => {
   db.query("SELECT id AS value, title AS name FROM role", (err, empResults) => {
     err ? console.log(err) : console.log("\n");
@@ -222,7 +222,7 @@ const addEmployee = () => {
   });
 };
 
-// TO DO: function for updateRole
+// function for updateRole
 const updateRole = () => {
   db.query(
     `SELECT CONCAT(first_name, " ", last_name) AS name, id AS value FROM employee`,
@@ -264,7 +264,7 @@ const updateRole = () => {
   );
 };
 
-// Quit function
+// function for quitProgram
 const quitProgram = () => {
   process.exit();
 };
