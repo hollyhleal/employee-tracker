@@ -92,7 +92,7 @@ const viewRoles = () => {
 // function for viewEmployees
 const viewEmployees = () => {
   db.query(
-    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, employee.manager_id AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
+    `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id`,
     function (err, results) {
       console.log("\n");
       console.table(results);
@@ -227,12 +227,9 @@ const updateRole = () => {
   db.query(
     `SELECT CONCAT(first_name, " ", last_name) AS name, id AS value FROM employee`,
     (err, results) => {
-      err ? console.log(err) : console.log(results);
       db.query(
         "SELECT id as value, title as name FROM role",
         (err, roleResults) => {
-          err ? console.log(err) : console.log(roleResults);
-
           inquirer
             .prompt([
               {
